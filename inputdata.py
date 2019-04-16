@@ -4,7 +4,8 @@ import csv
 import os
 
 root = os.getcwd()
-files = sorted(os.listdir(root))
+datafolder = os.path.join(root,'Data')
+files = sorted(os.listdir(datafolder))
 files = sorted([f for f in files if f[-9:] == 'train.csv'])
 
 data = {}
