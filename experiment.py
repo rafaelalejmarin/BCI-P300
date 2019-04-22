@@ -14,36 +14,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils import data
 from torch.utils.data import Dataset, DataLoader
+from net import Net3, Net5, Net10
 
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        # Convolution layers
-        self.conv1 = nn.Conv2d(1, 1, 3, padding=1)
-        self.conv2 = nn.Conv2d(1, 1, 3, padding=1)
-        self.conv3 = nn.Conv2d(1, 1, 3, padding=1)
-        self.conv4 = nn.Conv2d(1, 1, 3, padding=1)
-        self.conv5 = nn.Conv2d(1, 1, 3, padding=1)
-        
-        #self.pad = torch.nn.ReflectionPad2d(1) # Reflection padding if you want to use
-        self.relu = nn.ReLU()
-        self.sigmoid = nn.Sigmoid()
-        
-        # Full connection layers
-        self.fc1 = nn.Linear(8*60,60) # Change the first argument accordingly if the input dimension is not 8*60
-        self.fc2 = nn.Linear(60, 1)
-        
-    def forward(self, x):
-        x = self.conv1(x)
-        x = self.conv2(self.relu(x))
-        x = self.conv3(self.relu(x))
-        x = self.conv4(self.relu(x))
-        x = self.conv5(self.relu(x))
-        
-        x = x.view(-1,8*60)
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-        return x
+
 #%%    
 class B300Dataset(Dataset):
     """B300 dataset."""
@@ -124,7 +97,7 @@ for iter in range(10000):
         
 #%% Training use mini batches
 #my_p300 = B300Dataset(dataset, labelset)
-net = Net()
+net = Net10()
 criterion = nn.MSELoss()
 optimizer = torch.optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
 for epoch in range(10):  # loop over the dataset multiple times
@@ -173,11 +146,13 @@ def test_model(testSet, model):
         #print(i)
     return pred
 
-test_result = test_model(torch.tensor(train, dtype=torch.float32), net)
+test_result = test_model(torch.tensor(test, dtype=torch.float32), net)
 
 
+#%%
+from utils import acc
 
-
+result = acc(test_result.numpy(), test[10,:], 100)
 
 
 
